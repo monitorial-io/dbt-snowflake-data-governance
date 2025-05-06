@@ -1,0 +1,15 @@
+version: 2
+
+macros:
+  - name: set_column_projection_policy
+    description: This macro is designed to apply a projection policy on the view or table
+    docs:
+      show: false
+  - name: apply_projection_policy
+    description: This macro is designed to be used as post-hook for models to determined what projection policies should be applied to or removed from a model
+    docs:
+      show: true
+  - name: unset_column_projection_policy
+    description: This macro is designed to be to remove a projection policy from the view or table
+    docs:
+      show: false

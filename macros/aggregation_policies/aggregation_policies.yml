@@ -1,0 +1,15 @@
+version: 2
+
+macros:
+  - name: add_aggregation_policy
+    description: This macro is designed to add a aggregation policy on the view or table
+    docs:
+      show: false
+  - name: apply_aggregation_policies
+    description: This macro is designed to be used as post-hook for models to determined what aggregation policies should be applied to or removed from a model
+    docs:
+      show: true
+  - name: drop_aggregation_policy
+    description: This macro is designed to remove an aggrgeation policy from the view or table
+    docs:
+      show: false

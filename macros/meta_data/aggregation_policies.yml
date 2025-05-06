@@ -1,0 +1,11 @@
+version: 2
+
+macros:
+  - name: model_column_meta_contains_item
+    description: This macro is designed to determine if a column contains a given meta item
+    docs:
+      show: false
+  - name: model_meta_contains_item
+    description: This macro is designed to remove an aggrgeation policy from the view or table
+    docs:
+      show: false

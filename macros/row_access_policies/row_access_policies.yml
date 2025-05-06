@@ -1,0 +1,15 @@
+version: 2
+
+macros:
+  - name: add_row_access_policy
+    description: This macro is designed to apply the relevant row access policy on the view or table
+    docs:
+      show: false
+  - name: apply_row_access_policy
+    description: This macro is designed to be used as post-hook for models to determined what row access policy should be applied to or removed from a model
+    docs:
+      show: true
+  - name: drop_row_access_policy
+    description: This macro is designed to remove a row access policy from the view or table
+    docs:
+      show: false
