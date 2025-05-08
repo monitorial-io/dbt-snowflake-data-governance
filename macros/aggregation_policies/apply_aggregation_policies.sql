@@ -9,7 +9,7 @@
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
 
         {%- call statement('main', fetch_result=True) -%}
-            select POLICY_NAME, REF_ARG_COULUMN_NAMES
+            select POLICY_NAME, REF_ARG_COLUMN_NAMES
             from table(information_schema.policy_references(ref_entity_name => '{{model_schema_full}}.{{model_alias}}', ref_entity_domain=> 'table'))
             where policy_kind = 'AGGREGATION_POLICY';
         {%- endcall -%}
@@ -21,6 +21,10 @@
             {%- set remove_policies = [] %}
 
             {%- set dbt_aggregation_policies = model.meta["aggregation_policies"] -%}
+
+            {% if dbt_aggregation_policies is none %}
+              {%set dbt_aggregation_policies = [] %}
+            {% endif %}
 
             {% if dbt_aggregation_policies|length == 0 and existing_aggrgegate_policies_for_table|length > 0 %}
                 {% for policy in existing_aggrgegate_policies_for_table %}
@@ -44,6 +48,7 @@
                     {% else %}
                         {% set columns = [] %}
                     {% endif %}
+
                     {% set existing_policies_for_table = existing_aggrgegate_policies_for_table|selectattr('0','equalto', policy_name)|list %}
                     {% if existing_policies_for_table|length == 0 %}
                         {% do apply_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}

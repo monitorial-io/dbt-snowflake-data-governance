@@ -29,7 +29,7 @@ For more information on the Monitorial Data Governance Native App, please contac
 **policies**
 
 - `apply_aggregation_policies`
-- `apply_projection_policy`
+- `apply_projection_policies`
 - `apply_row_access_policy`
 
 ---

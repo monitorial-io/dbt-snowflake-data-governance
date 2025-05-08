@@ -1,4 +1,4 @@
-{% macro add_aggregation_policy(materlization, model_schema, model_name, column_name, policy_name, columns) %}
+{% macro add_aggregation_policy(materlization, model_schema, model_name, policy_name, columns) %}
     {{ log("Adding aggregation policy " + policy_name + " for model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
     {% if columns|length > 0 %}
         {%- call statement('set_statement', fetch_result=True) -%}

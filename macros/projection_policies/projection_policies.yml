@@ -5,7 +5,7 @@ macros:
     description: This macro is designed to apply a projection policy on the view or table
     docs:
       show: false
-  - name: apply_projection_policy
+  - name: apply_projection_policies
     description: This macro is designed to be used as post-hook for models to determined what projection policies should be applied to or removed from a model
     docs:
       show: true
