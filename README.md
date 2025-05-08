@@ -24,7 +24,7 @@ For more information on the Monitorial Data Governance Native App, please contac
 
 **tags**
 
-- `apply_meta_as_tags`
+- `apply_tags`
 
 **policies**
 
@@ -39,9 +39,9 @@ The macros must be called as part of the models post-hook for example:
 
 ```yaml
 post-hook:
-    - "{{ dbt_monitorial_datagovernance.apply_meta_as_tags(['pii_type', 'confidentiality_type', 'apply_masking_policy', 'semantic_type']) }}"
+    - "{{ dbt_monitorial_datagovernance.apply_tags(['pii_type', 'confidentiality_type', 'apply_masking_policy', 'semantic_type']) }}"
     - "{{ dbt_monitorial_datagovernance.apply_aggregation_policies() }}"
-    - "{{ dbt_monitorial_datagovernance.apply_projection_policy() }}"
+    - "{{ dbt_monitorial_datagovernance.apply_projection_policies() }}"
     - "{{ dbt_monitorial_datagovernance.apply_row_access_policy() }}"
 ```
 

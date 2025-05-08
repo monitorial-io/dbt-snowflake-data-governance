@@ -1,0 +1,7 @@
+        projection_policy: human_resources_restricted
+        projection_policy: internal_joins_only
+
+
+      pii_type: pin
+      confidentiality_type: confidential
+      projection_policy: internal_joins_only

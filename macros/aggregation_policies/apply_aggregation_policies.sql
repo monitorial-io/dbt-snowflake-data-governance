@@ -24,7 +24,7 @@
 
             {% if dbt_aggregation_policies|length == 0 and existing_aggrgegate_policies_for_table|length > 0 %}
                 {% for policy in existing_aggrgegate_policies_for_table %}
-                    {% set remove_policies.append(policy) %}
+                    {% do remove_policies.append({ "policy_name" : policy[0], "columns" : policy[1] }) %}
                 {% endfor %}
             {% else %}
 
@@ -33,7 +33,7 @@
                     {% set columns = policy[1] %}
                     {% set dbt_policy = dbt_aggregation_policies|selectattr('name','equalto',policy_name)|list %}
                     {% if dbt_policy|length == 0 %}
-                        {% set remove_policies.append({ "policy_name" : policy_name, "columns" : columns}) %}
+                        {% do remove_policies.append({ "policy_name" : policy_name, "columns" : columns}) %}
                     {% endif %}
                 {% endfor %}
 
@@ -46,7 +46,7 @@
                     {% endif %}
                     {% set existing_policies_for_table = existing_aggrgegate_policies_for_table|selectattr('0','equalto', policy_name)|list %}
                     {% if existing_policies_for_table|length == 0 %}
-                        {% set apply_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
+                        {% do apply_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
                     {% else %}
                         {% set found_matching_existing_policy = false %}
                         {% for existing_policy in existing_policies_for_table %}
@@ -57,9 +57,9 @@
                             {% endif %}
                         {% endfor %}
                         {% if not found_matching_existing_policy %}
-                            {% set apply_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
+                            {% do apply_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
                         {% else %}
-                            {% set no_change_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
+                            {% do no_change_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
                         {% endif %}
                     {% endif %}
                 {% endfor %}
@@ -69,7 +69,7 @@
                     {% set columns = policy[1] %}
                     {% set dbt_policies = dbt_aggregation_policies|selectattr('name','equalto',policy_name)|list %}
                     {% if dbt_policies|length == 0 %}
-                        {% set remove_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
+                        {% do remove_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
                     {% else %}
                         {% for dbt_policy in dbt_policies %}
                             {% if "entity_keys" in dbt_policy %}
@@ -78,7 +78,7 @@
                                 {% set dbt_policy_columns = [] %}
                             {% endif %}
                             {% if columns|sort != dbt_policy_columns|sort %}
-                                {% set remove_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
+                                {% do remove_policies.append({ "policy_name" : policy_name, "columns" : columns }) %}
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -101,7 +101,7 @@
                 {% set policy_name = policy[0] %}
                 {% set columns = policy[1] %}
                 {{ dbt_monitorial_datagovernance.drop_aggregation_policy(materialization, model_schema, model_alias, policy_name, columns)}}
-            {% endif %}
+            {% endfor %}
         {% endif %}
     {% endif %}
 {% endmacro %}

@@ -1,7 +1,7 @@
 version: 2
 
 macros:
-  - name: model_column_meta_contains_item
+  - name: model_column_meta_contains_items
     description: This macro is designed to determine if a column contains a given meta item
     docs:
       show: false

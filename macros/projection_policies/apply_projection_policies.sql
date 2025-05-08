@@ -15,15 +15,17 @@
             {%- endcall -%}
             {%- set existing_projection_policies_for_table = load_result('main')['data'] -%}
             {% for column in model.columns %}
-                {% set desired_projection_policy_value = model.columns[column].meta["projection_policy"] %}
-                {%- set existing_policy_for_columns = existing_projection_policies_for_table|selectattr('21','equalto',column|upper)|list -%}
-                {% if desired_projection_policy_value == 'none' and existing_policy_for_columns|length > 0  %}
-                    {{ log("Removing projection policy from model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
-                    {{ dbt_monitorial_datagovernance.unset_column_projection_policy(materialization, model_schema, model_alias, column|upper)}}
-                {% elif desired_projection_policy_value != 'none' %}
-                    {{ log("Applying projection policy for model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
-                    {{ dbt_monitorial_datagovernance.set_column_projection_policy_value(materialization, model_schema, model_alias, column|upper, column_projection_policy)}}
-                {% endif%}
+                {% if "projection_policy" in model.columns[column].meta %}
+                    {% set desired_projection_policy_value = model.columns[column].meta["projection_policy"] %}
+                    {%- set existing_policy_for_columns = existing_projection_policies_for_table|selectattr('21','equalto',column|upper)|list -%}
+                    {% if desired_projection_policy_value == 'none' and existing_policy_for_columns|length > 0  %}
+                        {{ log("Removing projection policy from model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
+                        {{ dbt_monitorial_datagovernance.unset_column_projection_policy(materialization, model_schema, model_alias, column|upper)}}
+                    {% elif desired_projection_policy_value != 'none' %}
+                        {{ log("Applying '" ~ desired_projection_policy_value ~ "' projection policy for model " + model_schema|lower ~ "." ~ model_alias|lower ~ "." ~ column|lower, info=True) }}
+                        {{ dbt_monitorial_datagovernance.set_column_projection_policy(materialization, model_schema, model_alias, column|upper, desired_projection_policy_value)}}
+                    {% endif%}
+                {% endif %}
             {% endfor %}
         {% endif %}
     {% endif %}

@@ -1,6 +1,8 @@
 {% macro set_column_tag_value(materlization, model_schema, model_name, column_name, tag_name, desired_tag_value, existing_tags_for_table) %}
     {% if tag_name|lower in ["pii_type", "confidentiality_type", "semantic_type"] %}
         {%set tag_name=tag_name|replace("_type", "_classification") %}
+    {% elif tag_name == "confidential_type" %}
+        {%set tag_name="confidentiality_classification" %}
     {% elif tag_name == "default_mask" %}
         {%set tag_name="default_mask_value" %}
     {% endif %}

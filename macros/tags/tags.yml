@@ -1,7 +1,7 @@
 version: 2
 
 macros:
-  - name: apply_meta_as_tags
+  - name: apply_tags
     description: This macro is designed to be used as post-hook for models to apply the relevant meta data as tags on the view or table
     docs:
       show: true
