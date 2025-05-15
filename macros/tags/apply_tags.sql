@@ -2,6 +2,7 @@
     {% if execute %}
         {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table", "immutable_table" : "table", "materialized_view" : "view"} %}
         {% if dbt_monitorial_datagovernance.model_column_meta_contains_items(tag_names, model) %}
+            {{ log("Applying tags for model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
             {% set tag_names_str = tag_names | join(', ') %}
             {%- set model_database = model.database -%}
             {%- set model_schema =  model.schema|upper -%}
@@ -18,7 +19,6 @@
                 {% for column_tag in model.columns[column].meta %}
                     {% if column_tag in tag_names %}
                         {% set desired_tag_value = model.columns[column].meta[column_tag] %}
-                        {{ log("Applying tags for model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
                         {{ dbt_monitorial_datagovernance.set_column_tag_value(materialization, model_schema, model_alias|upper,column|upper,column_tag,desired_tag_value, existing_tags_for_table)}}
                     {% endif %}
                 {% endfor %}
