@@ -16,9 +16,13 @@
             {%- endcall -%}
             {%- set existing_tags_for_table = load_result('main')['data'] -%}
             {% for column in model.columns %}
-                {% for column_tag in model.columns[column].meta %}
+                {%- set meta_data = model.columns[column].get("config", {}).get("meta")%}
+                {% if not meta_data %}
+                    {% set meta_data = model.columns[column].meta %}
+                {% endif %}
+                {% for column_tag in meta_data %}
                     {% if column_tag in tag_names %}
-                        {% set desired_tag_value = model.columns[column].meta[column_tag] %}
+                        {% set desired_tag_value = meta_data[column_tag] %}
                         {{ dbt_monitorial_datagovernance.set_column_tag_value(materialization, model_schema, model_alias|upper,column|upper,column_tag,desired_tag_value, existing_tags_for_table)}}
                     {% endif %}
                 {% endfor %}

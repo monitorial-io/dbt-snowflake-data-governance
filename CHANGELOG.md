@@ -4,6 +4,7 @@
 
 ## Version 0.1.3 (2025-07-13)
 - Fixed issue with row access policy not applying correctly.
+- Added ability to handle metadata found under the config nodes of either the model or columns
 
 ## Version 0.1.2 (2025-05-16)
 - Added support for new aggregation policies.

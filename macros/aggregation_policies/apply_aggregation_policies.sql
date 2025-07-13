@@ -7,6 +7,10 @@
         {%- set model_schema_full = model_database + '.' + model_schema -%}
         {%- set model_alias = model.alias|upper -%}
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
+        {%- set meta_data = model.config.get("meta")%}
+        {% if not meta_data %}
+              {% set meta_data = model.meta %}
+        {% endif %}
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}
                 select POLICY_NAME, REF_ARG_COLUMN_NAMES
@@ -20,7 +24,7 @@
                 {%- set no_change_policies = [] %}
                 {%- set remove_policies = [] %}
 
-                {%- set dbt_aggregation_policies = model.meta["aggregation_policies"] -%}
+                {%- set dbt_aggregation_policies = meta_data["aggregation_policies"] -%}
 
                 {% if dbt_aggregation_policies is none %}
                 {%set dbt_aggregation_policies = [] %}

@@ -16,8 +16,12 @@
                 {%- endcall -%}
                 {%- set existing_projection_policies_for_table = load_result('main')['data'] -%}
                 {% for column in model.columns %}
-                    {% if "projection_policy" in model.columns[column].meta %}
-                        {% set desired_projection_policy_value = model.columns[column].meta["projection_policy"] %}
+                     {%- set meta_data = model.columns[column].get("config", {}).get("meta")%}
+                     {% if not meta_data %}
+                            {% set meta_data = model.columns[column].meta %}
+                    {% endif %}
+                    {% if "projection_policy" in meta_data %}
+                        {% set desired_projection_policy_value = meta_data["projection_policy"] %}
                         {%- set existing_policy_for_columns = existing_projection_policies_for_table|selectattr('21','equalto',column|upper)|list -%}
                         {% if desired_projection_policy_value == 'none' and existing_policy_for_columns|length > 0  %}
                             {{ log("Removing projection policy from model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
