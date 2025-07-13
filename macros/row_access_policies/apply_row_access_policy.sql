@@ -9,7 +9,7 @@
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}
                 select
-                    POLICY_NAME, REF_COLUMN_NAMES
+                    POLICY_NAME, REF_ARG_COLUMN_NAMES
                 from table(information_schema.policy_references(ref_entity_name => '{{model_schema_full}}.{{model_alias}}', ref_entity_domain=> 'table'))
                 where policy_kind = 'ROW_ACCESS_POLICY';
             {%- endcall -%}
