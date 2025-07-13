@@ -30,19 +30,59 @@
                         {{ dbt_monitorial_datagovernance.add_row_access_policy(materialization, model_schema, model_alias, policy_name, columns)}}
                     {% endfor %}
                 {% else %} 
+                    {% set policies_to_drop = [] %}
+                    {% set policies_no_change = [] %}
                     {% for policy in existing_row_access_policies_for_table %}
-                        {% set existing_policy_name = policy[0] %}
-                        {% set existing_columns = policy[1] %}
-                        {% set found_matching_existing_policy = false %}
+                        {% set existing_policy_name = policy[0] | lower%}
+                        {% set existing_columns_raw = policy[1] %}
+                        {% if existing_columns_raw is string %}
+                            {% if existing_columns_raw.startswith('[') and existing_columns_raw.endswith(']') %}
+                                {# Parse the string representation of a list #}
+                                {% set existing_columns_str = existing_columns_raw[1:-1] %}
+                                {% set existing_columns = [] %}
+                                {% for item in existing_columns_str.split(',') %}
+                                    {% set clean_item = item.strip().strip('"').strip("'") %}
+                                    {% if clean_item %}
+                                        {% do existing_columns.append(clean_item | lower) %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% set existing_columns = [existing_columns_raw | lower] %}
+                            {% endif %}
+                        {% elif existing_columns_raw is iterable %}
+                            {% set existing_columns = existing_columns_raw %}
+                        {% else %}
+                            {% set existing_columns = [existing_columns_raw | lower] %}
+                        {% endif %}
                         {% for dbt_policy in dbt_row_access_policies %}
-                            {% set policy_name = dbt_policy.get("name") %}
+                            {% set policy_name = dbt_policy.get("name") | lower%}
                             {% set columns = dbt_policy.get("columns") %}
-                            {% if existing_policy_name != policy_name or existing_columns|sort != columns|sort %}
-                                {{ dbt_monitorial_datagovernance.drop_row_access_policy(materialization, model_schema, model_alias, existing_policy_name)}}
-                                {{ dbt_monitorial_datagovernance.add_row_access_policy(materialization, model_schema, model_alias, policy_name, columns)}}
+                            {% if existing_policy_name | lower == policy_name | lower and existing_columns|sort != columns|sort %}
+                                {% do policies_to_drop.append(existing_policy_name) %}
+
+                                {% break %}
+                            {% elif existing_policy_name  == policy_name and existing_columns|sort == columns|sort %}
+                                {% do policies_no_change.append(policy_name) %}
+                                {% set policy_found = true %}
                                 {% break %}
                             {% endif %}
                         {% endfor %}
+                        {% if existing_policy_name not in policies_no_change %}
+                            {% do policies_to_drop.append(existing_policy_name) %}
+                        {% endif %}
+                    {% endfor %}
+                    {% for existing_policy_name in policies_to_drop %}
+                        {% do log("Dropping policy: " ~ existing_policy_name, info=True) %}
+                        {{ dbt_monitorial_datagovernance.drop_row_access_policy(materialization, model_schema, model_alias, existing_policy_name)}}
+                    {% endfor %}
+                    {% for dbt_policy in dbt_row_access_policies %}
+                        {% set policy_name = dbt_policy.get("name") %}
+                        {% set columns = dbt_policy.get("columns") %}
+                        {% if policy_name not in policies_no_change %}
+                            {{ dbt_monitorial_datagovernance.add_row_access_policy(materialization, model_schema, model_alias, policy_name, columns)}}
+                        {% else %}
+                            {% do log("Policy " ~ policy_name ~ " already exists with the same columns, skipping addition.", info=True) %}
+                        {% endif %}
                     {% endfor %}
                 {% endif %}
             {% elif existing_row_access_policies_for_table|length > 0 %}

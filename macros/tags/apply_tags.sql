@@ -22,7 +22,7 @@
                 {% endif %}
                 {% for column_tag in meta_data %}
                     {% if column_tag in tag_names %}
-                        {% set desired_tag_value = meta_data[column_tag] %}
+                        {% set desired_tag_value = meta_data[column_tag] %} 
                         {{ dbt_monitorial_datagovernance.set_column_tag_value(materialization, model_schema, model_alias|upper,column|upper,column_tag,desired_tag_value, existing_tags_for_table)}}
                     {% endif %}
                 {% endfor %}
