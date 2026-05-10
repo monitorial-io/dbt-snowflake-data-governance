@@ -361,13 +361,14 @@ models:
 The integration test suite lives in `integration_tests/` and requires a Snowflake connection.
 
 ```bash
-# Set environment variables for Snowflake connection
-export SNOWFLAKE_TEST_ACCOUNT="your_account"
-export SNOWFLAKE_TEST_USER="your_user"
-export SNOWFLAKE_TEST_PASSWORD="your_password"
-export SNOWFLAKE_TEST_ROLE="your_role"
-export SNOWFLAKE_TEST_DATABASE="your_database"
-export SNOWFLAKE_TEST_WAREHOUSE="your_warehouse"
+# Set environment variables for Snowflake connection (JWT auth)
+export SNOWFLAKE_ACCOUNT="your_account"
+export SNOWFLAKE_USER="your_user"
+export SNOWFLAKE_ROLE="your_role"
+export SNOWFLAKE_DATABASE="your_database"
+export SNOWFLAKE_WAREHOUSE="your_warehouse"
+export SNOWFLAKE_PRIVATE_KEY_PATH="/path/to/rsa_key.p8"
+export SNOWFLAKE_PRIVATE_KEY_PASSPHRASE="your_passphrase"  # omit if key is unencrypted
 
 # Install dependencies and run tests
 cd integration_tests

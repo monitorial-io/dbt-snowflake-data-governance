@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  DBT_PROFILES_DIR: ${{ github.workspace }}/integration_tests
+
 jobs:
   lint:
     name: Lint (dbt parse)
@@ -28,6 +31,40 @@ jobs:
       - name: Install dbt-snowflake
         run: pip install "dbt-snowflake~=${{ matrix.dbt-version }}"
 
+      - name: Write private key
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
+          chmod 600 /tmp/rsa_key.p8
+
+      - name: Create dbt profiles.yml
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+        run: |
+          {
+            echo "integration_tests:"
+            echo "  target: ci"
+            echo "  outputs:"
+            echo "    ci:"
+            echo "      type: snowflake"
+            echo "      account: \"${SNOWFLAKE_ACCOUNT}\""
+            echo "      user: \"${SNOWFLAKE_USER}\""
+            echo "      authenticator: snowflake_jwt"
+            echo "      private_key_path: /tmp/rsa_key.p8"
+            if [ -n "$SNOWFLAKE_PRIVATE_KEY_PASSPHRASE" ]; then
+              echo "      private_key_passphrase: \"${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE}\""
+            fi
+            echo "      role: \"${SNOWFLAKE_ROLE}\""
+            echo "      warehouse: \"${SNOWFLAKE_WAREHOUSE}\""
+            echo "      database: \"${SNOWFLAKE_DATABASE}\""
+            echo "      schema: DBT_GOVERNANCE_CI"
+            echo "      threads: 4"
+          } > integration_tests/profiles.yml
+
       - name: Install packages
         working-directory: integration_tests
         run: dbt deps
@@ -35,14 +72,6 @@ jobs:
       - name: Parse project (validate Jinja compilation)
         working-directory: integration_tests
         run: dbt parse
-        env:
-          SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
-          SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
-          SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
-          SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
-          SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
-          SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI
 
   integration:
     name: Integration Tests
@@ -66,44 +95,50 @@ jobs:
       - name: Install dbt-snowflake
         run: pip install "dbt-snowflake~=${{ matrix.dbt-version }}"
 
+      - name: Write private key
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
+          chmod 600 /tmp/rsa_key.p8
+
+      - name: Create dbt profiles.yml
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+        run: |
+          {
+            echo "integration_tests:"
+            echo "  target: ci"
+            echo "  outputs:"
+            echo "    ci:"
+            echo "      type: snowflake"
+            echo "      account: \"${SNOWFLAKE_ACCOUNT}\""
+            echo "      user: \"${SNOWFLAKE_USER}\""
+            echo "      authenticator: snowflake_jwt"
+            echo "      private_key_path: /tmp/rsa_key.p8"
+            if [ -n "$SNOWFLAKE_PRIVATE_KEY_PASSPHRASE" ]; then
+              echo "      private_key_passphrase: \"${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE}\""
+            fi
+            echo "      role: \"${SNOWFLAKE_ROLE}\""
+            echo "      warehouse: \"${SNOWFLAKE_WAREHOUSE}\""
+            echo "      database: \"${SNOWFLAKE_DATABASE}\""
+            echo "      schema: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}"
+            echo "      threads: 4"
+          } > integration_tests/profiles.yml
+
       - name: Install packages
         working-directory: integration_tests
         run: dbt deps
 
-      - name: Run models
+      - name: Run dbt build (models + tests)
         working-directory: integration_tests
-        run: dbt run
-        env:
-          SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
-          SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
-          SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
-          SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
-          SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
-          SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}
-
-      - name: Run tests
-        working-directory: integration_tests
-        run: dbt test
-        env:
-          SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
-          SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
-          SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
-          SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
-          SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
-          SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}
+        run: dbt build
 
       - name: Cleanup test schema
         if: always()
         working-directory: integration_tests
         run: |
           dbt run-operation drop_schema --args '{schema_name: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}}' || true
-        env:
-          SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
-          SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
-          SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
-          SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
-          SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
-          SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}
