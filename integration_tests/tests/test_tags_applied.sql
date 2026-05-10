@@ -1,5 +1,6 @@
 -- Test that pii_classification tag was applied to the full_name column
 -- This test passes if the tag exists (returns 0 rows)
+-- depends_on: {{ ref('test_tags_model') }}
 {% set model_schema = target.database | upper ~ '.' ~ target.schema | upper %}
 
 with expected_tags as (

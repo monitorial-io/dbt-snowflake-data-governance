@@ -1,5 +1,6 @@
 -- Test that the projection policy was applied to the sensitive_data column
 -- Returns rows if the expected policy is missing (test fails)
+-- depends_on: {{ ref('test_projection_policy_model') }}
 {% set model_schema = target.database | upper ~ '.' ~ target.schema | upper %}
 
 with expected as (

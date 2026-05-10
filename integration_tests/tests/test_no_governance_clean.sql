@@ -1,5 +1,6 @@
 -- Test that the control model with no governance config has no policies applied
 -- Returns rows if unexpected policies are found (test fails)
+-- depends_on: {{ ref('test_no_governance_model') }}
 {% set model_schema = target.database | upper ~ '.' ~ target.schema | upper %}
 
 select

@@ -1,5 +1,6 @@
 -- Test that the aggregation policy was applied to the model
 -- Returns rows if the expected policy is missing (test fails)
+-- depends_on: {{ ref('test_aggregation_policy_model') }}
 {% set model_schema = target.database | upper ~ '.' ~ target.schema | upper %}
 
 with expected_policies as (
