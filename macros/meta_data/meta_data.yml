@@ -6,6 +6,6 @@ macros:
     docs:
       show: false
   - name: model_meta_contains_item
-    description: This macro is designed to remove an aggrgeation policy from the view or table
+    description: This macro checks if a model's metadata contains a specific item by name
     docs:
       show: false

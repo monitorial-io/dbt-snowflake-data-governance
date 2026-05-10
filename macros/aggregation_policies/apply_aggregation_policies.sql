@@ -105,7 +105,7 @@
                     {% set column_names = policy["columns"] %}
                     {{ dbt_monitorial_datagovernance.add_aggregation_policy(materialization, model_schema, model_alias, policy_name, column_names)}}
                 {% endfor %}
-            {% elif  existing_aggrgegate_policies_for_table|length == 0 %}
+            {% elif  existing_aggrgegate_policies_for_table|length > 0 %}
                 {% for policy in existing_aggrgegate_policies_for_table %}
                     {% set policy_name = policy[0] %}
                     {% set columns = policy[1] %}

@@ -3,3 +3,15 @@ target/
 dbt_packages/
 logs/
 dbt_internal_packages/
+
+# IDE
+.vscode/
+
+# OS
+desktop.ini
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*

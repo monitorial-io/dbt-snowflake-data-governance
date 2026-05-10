@@ -22,7 +22,7 @@
                     {% endif %}
                     {% if "projection_policy" in meta_data %}
                         {% set desired_projection_policy_value = meta_data["projection_policy"] %}
-                        {%- set existing_policy_for_columns = existing_projection_policies_for_table|selectattr('21','equalto',column|upper)|list -%}
+                        {%- set existing_policy_for_columns = existing_projection_policies_for_table|selectattr('1','equalto',column|upper)|list -%}
                         {% if desired_projection_policy_value == 'none' and existing_policy_for_columns|length > 0  %}
                             {{ log("Removing projection policy from model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
                             {{ dbt_monitorial_datagovernance.unset_column_projection_policy(materialization, model_schema, model_alias, column|upper)}}

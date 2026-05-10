@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: test_tags_model
+    description: "Test model for validating tag application via apply_tags macro"
+    config:
+      post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_tags(['pii_type', 'confidentiality_type', 'semantic_type']) }}"
+    columns:
+      - name: id
+        description: "Primary key"
+        data_type: NUMBER
+      - name: full_name
+        description: "Person full name"
+        data_type: VARCHAR
+        meta:
+          pii_type: name
+          confidentiality_type: confidential
+      - name: email_address
+        description: "Email address"
+        data_type: VARCHAR
+        meta:
+          pii_type: email
+          confidentiality_type: restricted
+          semantic_type: email
+
+  - name: test_projection_policy_model
+    description: "Test model for validating projection policy application"
+    config:
+      post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_projection_policies() }}"
+    columns:
+      - name: id
+        description: "Primary key"
+        data_type: NUMBER
+      - name: sensitive_data
+        description: "Column that should have a projection policy"
+        data_type: VARCHAR
+        meta:
+          projection_policy: restrict_projection
+
+  - name: test_aggregation_policy_model
+    description: "Test model for validating aggregation policy application"
+    meta:
+      aggregation_policies:
+        - name: min_group_size
+          entity_keys:
+            - id
+    config:
+      post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_aggregation_policies() }}"
+    columns:
+      - name: id
+        description: "Primary key"
+        data_type: NUMBER
+      - name: metric_value
+        description: "Sensitive metric"
+        data_type: NUMBER
+
+  - name: test_row_access_policy_model
+    description: "Test model for validating row access policy application"
+    meta:
+      row_access_policy:
+        - name: restrict_rows
+          columns:
+            - id
+    config:
+      post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_row_access_policy() }}"
+    columns:
+      - name: id
+        description: "Primary key"
+        data_type: NUMBER
+      - name: department
+        description: "Department name"
+        data_type: VARCHAR
+
+  - name: test_no_governance_model
+    description: "Control model with no governance config - should run without errors"
+    columns:
+      - name: id
+        description: "Primary key"
+        data_type: NUMBER
+      - name: value
+        description: "Simple value"
+        data_type: VARCHAR
