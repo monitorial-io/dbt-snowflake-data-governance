@@ -373,8 +373,7 @@ export SNOWFLAKE_PRIVATE_KEY_PASSPHRASE="your_passphrase"  # omit if key is unen
 # Install dependencies and run tests
 cd integration_tests
 dbt deps
-dbt run
-dbt test
+dbt build
 ```
 
 The CI pipeline runs these tests automatically on pull requests against dbt-core 1.9.x and 1.10.x.

@@ -3,7 +3,7 @@
 {% set model_schema = target.database | upper ~ '.' ~ target.schema | upper %}
 
 with expected_policies as (
-    select 'MIN_GROUP_SIZE' as policy_name
+    select 'AGG_MIN_GROUP_FIVE' as policy_name
 ),
 actual_policies as (
     select upper(POLICY_NAME) as policy_name

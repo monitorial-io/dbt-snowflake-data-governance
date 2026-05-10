@@ -21,10 +21,10 @@ jobs:
           - dbt-version: '1.10.0'
             schema-suffix: '1_10'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6
         with:
           python-version: '3.11'
 
@@ -85,10 +85,10 @@ jobs:
           - dbt-version: '1.10.0'
             schema-suffix: '1_10'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6
         with:
           python-version: '3.11'
 
@@ -132,6 +132,10 @@ jobs:
       - name: Install packages
         working-directory: integration_tests
         run: dbt deps
+
+      - name: Setup governance objects (tags, policies)
+        working-directory: integration_tests
+        run: dbt run-operation setup_governance_objects
 
       - name: Run dbt build (models + tests)
         working-directory: integration_tests

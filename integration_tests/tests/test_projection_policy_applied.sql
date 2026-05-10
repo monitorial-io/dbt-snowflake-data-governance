@@ -3,7 +3,7 @@
 {% set model_schema = target.database | upper ~ '.' ~ target.schema | upper %}
 
 with expected as (
-    select 'SENSITIVE_DATA' as column_name, 'RESTRICT_PROJECTION' as policy_name
+    select 'SENSITIVE_DATA' as column_name, 'HIDE_COLUMN' as policy_name
 ),
 actual_policies as (
     select

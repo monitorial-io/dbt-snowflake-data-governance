@@ -34,14 +34,14 @@ models:
         data_type: VARCHAR
         config:
           meta:
-            projection_policy: restrict_projection
+            projection_policy: hide_column
 
   - name: test_aggregation_policy_model
     description: "Test model for validating aggregation policy application"
     config:
       meta:
         aggregation_policies:
-          - name: min_group_size
+          - name: agg_min_group_five
             entity_keys:
               - id
     columns:
