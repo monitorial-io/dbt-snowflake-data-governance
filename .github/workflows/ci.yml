@@ -145,4 +145,4 @@ jobs:
         if: always()
         working-directory: integration_tests
         run: |
-          dbt run-operation drop_schema --args '{schema_name: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}}' || true
+          dbt run-operation run_query --args '{"query": "DROP SCHEMA IF EXISTS DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }} CASCADE"}' || true
