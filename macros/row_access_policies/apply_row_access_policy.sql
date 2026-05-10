@@ -6,9 +6,10 @@
         {%- set model_schema_full = model_database + '.' + model_schema -%}
         {%- set model_alias = model.alias|upper -%}
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
-        {%- set meta_data = model.get("config", {}).get("meta")%}
-        {% if not meta_data %}
-              {% set meta_data = model.meta %}
+        {% if model.config is defined and model.config.meta is defined %}
+            {%- set meta_data = model.config.meta %}
+        {% else %}
+            {%- set meta_data = model.get("meta", {}) %}
         {% endif %}
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}

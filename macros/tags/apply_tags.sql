@@ -16,9 +16,10 @@
             {%- endcall -%}
             {%- set existing_tags_for_table = load_result('main')['data'] -%}
             {% for column in model.columns %}
-                {%- set meta_data = model.columns[column].get("config", {}).get("meta")%}
-                {% if not meta_data %}
-                    {% set meta_data = model.columns[column].meta %}
+                {% if model.columns[column].config is defined and model.columns[column].config.meta is defined %}
+                    {%- set meta_data = model.columns[column].config.meta %}
+                {% else %}
+                    {%- set meta_data = model.columns[column].get("meta", {}) %}
                 {% endif %}
                 {% for column_tag in meta_data %}
                     {% if column_tag in tag_names %}

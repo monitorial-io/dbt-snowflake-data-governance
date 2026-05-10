@@ -19,8 +19,8 @@ models:
         data_type: VARCHAR
         config:
           meta:
-            pii_type: email
-            confidentiality_type: restricted
+            pii_type: address
+            confidentiality_type: secret
             semantic_type: email
 
   - name: test_projection_policy_model

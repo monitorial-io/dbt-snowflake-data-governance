@@ -16,9 +16,10 @@
                 {%- endcall -%}
                 {%- set existing_projection_policies_for_table = load_result('main')['data'] -%}
                 {% for column in model.columns %}
-                     {%- set meta_data = model.columns[column].get("config", {}).get("meta")%}
-                     {% if not meta_data %}
-                            {% set meta_data = model.columns[column].meta %}
+                    {% if model.columns[column].config is defined and model.columns[column].config.meta is defined %}
+                        {%- set meta_data = model.columns[column].config.meta %}
+                    {% else %}
+                        {%- set meta_data = model.columns[column].get("meta", {}) %}
                     {% endif %}
                     {% if "projection_policy" in meta_data %}
                         {% set desired_projection_policy_value = meta_data["projection_policy"] %}
