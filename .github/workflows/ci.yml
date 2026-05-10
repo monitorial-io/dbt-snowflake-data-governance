@@ -12,7 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dbt-version: ['1.9.*', '1.10.*']
+        include:
+          - dbt-version: '1.9.0'
+            schema-suffix: '1_9'
+          - dbt-version: '1.10.0'
+            schema-suffix: '1_10'
     steps:
       - uses: actions/checkout@v4
 
@@ -22,7 +26,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dbt-snowflake
-        run: pip install "dbt-snowflake==${{ matrix.dbt-version }}"
+        run: pip install "dbt-snowflake~=${{ matrix.dbt-version }}"
 
       - name: Install packages
         working-directory: integration_tests
@@ -46,7 +50,11 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        dbt-version: ['1.9.*', '1.10.*']
+        include:
+          - dbt-version: '1.9.0'
+            schema-suffix: '1_9'
+          - dbt-version: '1.10.0'
+            schema-suffix: '1_10'
     steps:
       - uses: actions/checkout@v4
 
@@ -56,7 +64,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dbt-snowflake
-        run: pip install "dbt-snowflake==${{ matrix.dbt-version }}"
+        run: pip install "dbt-snowflake~=${{ matrix.dbt-version }}"
 
       - name: Install packages
         working-directory: integration_tests
@@ -72,7 +80,7 @@ jobs:
           SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
           SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
           SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.dbt-version }}
+          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}
 
       - name: Run tests
         working-directory: integration_tests
@@ -84,13 +92,13 @@ jobs:
           SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
           SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
           SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.dbt-version }}
+          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}
 
       - name: Cleanup test schema
         if: always()
         working-directory: integration_tests
         run: |
-          dbt run-operation drop_schema --args '{schema_name: DBT_GOVERNANCE_CI_${{ matrix.dbt-version }}}' || true
+          dbt run-operation drop_schema --args '{schema_name: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}}' || true
         env:
           SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
           SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
@@ -98,4 +106,4 @@ jobs:
           SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
           SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
           SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
-          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.dbt-version }}
+          SNOWFLAKE_TEST_SCHEMA: DBT_GOVERNANCE_CI_${{ matrix.schema-suffix }}
