@@ -1,0 +1,15 @@
+integration_tests:
+  target: default
+  outputs:
+    default:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'placeholder') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'placeholder') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'placeholder') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'placeholder') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'placeholder') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'DBT_GOVERNANCE_TESTS') }}"
+      authenticator: snowflake_jwt
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
+      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE', '') }}"
+      threads: 4

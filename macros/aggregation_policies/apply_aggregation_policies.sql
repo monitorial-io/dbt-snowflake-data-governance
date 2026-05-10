@@ -7,9 +7,9 @@
         {%- set model_schema_full = model_database + '.' + model_schema -%}
         {%- set model_alias = model.alias|upper -%}
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
-        {%- set meta_data = model.config.get("meta")%}
+        {% set meta_data = model.config.get("meta", {}) if model.config is defined else {} %}
         {% if not meta_data %}
-              {% set meta_data = model.meta %}
+            {% set meta_data = model.get("meta", {}) %}
         {% endif %}
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}
@@ -105,7 +105,7 @@
                     {% set column_names = policy["columns"] %}
                     {{ dbt_monitorial_datagovernance.add_aggregation_policy(materialization, model_schema, model_alias, policy_name, column_names)}}
                 {% endfor %}
-            {% elif  existing_aggrgegate_policies_for_table|length == 0 %}
+            {% elif  existing_aggrgegate_policies_for_table|length > 0 %}
                 {% for policy in existing_aggrgegate_policies_for_table %}
                     {% set policy_name = policy[0] %}
                     {% set columns = policy[1] %}
