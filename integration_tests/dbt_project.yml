@@ -19,3 +19,15 @@ vars:
 models:
   dbt_monitorial_datagovernance_integration_tests:
     +materialized: table
+    test_tags_model:
+      +post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_tags(['pii_type', 'confidentiality_type', 'semantic_type']) }}"
+    test_aggregation_policy_model:
+      +post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_aggregation_policies() }}"
+    test_projection_policy_model:
+      +post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_projection_policies() }}"
+    test_row_access_policy_model:
+      +post-hook:
+        - "{{ dbt_monitorial_datagovernance.apply_row_access_policy() }}"

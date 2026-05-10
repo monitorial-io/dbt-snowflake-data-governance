@@ -3,11 +3,11 @@ integration_tests:
   outputs:
     default:
       type: snowflake
-      account: "{{ env_var('SNOWFLAKE_TEST_ACCOUNT') }}"
-      user: "{{ env_var('SNOWFLAKE_TEST_USER') }}"
-      password: "{{ env_var('SNOWFLAKE_TEST_PASSWORD', '') }}"
-      role: "{{ env_var('SNOWFLAKE_TEST_ROLE') }}"
-      database: "{{ env_var('SNOWFLAKE_TEST_DATABASE') }}"
-      warehouse: "{{ env_var('SNOWFLAKE_TEST_WAREHOUSE') }}"
-      schema: "{{ env_var('SNOWFLAKE_TEST_SCHEMA', 'DBT_GOVERNANCE_TESTS') }}"
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'placeholder') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'placeholder') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', 'placeholder') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'placeholder') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'placeholder') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'placeholder') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'DBT_GOVERNANCE_TESTS') }}"
       threads: 4
