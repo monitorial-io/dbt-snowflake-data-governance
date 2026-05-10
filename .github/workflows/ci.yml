@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  DBT_PROFILES_DIR: ./integration_tests
-
 jobs:
   lint:
     name: Lint (dbt parse)
