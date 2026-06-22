@@ -7,10 +7,7 @@
         {%- set model_schema_full = model_database + '.' + model_schema -%}
         {%- set model_alias = model.alias|upper -%}
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
-        {% set meta_data = model.config.get("meta", {}) if model.config is defined else {} %}
-        {% if not meta_data %}
-            {% set meta_data = model.get("meta", {}) %}
-        {% endif %}
+        {% set _aggregation_policy_data = dbt_monitorial_datagovernance.get_model_meta_item("aggregation_policies", model) %}
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}
                 select POLICY_NAME, REF_ARG_COLUMN_NAMES
@@ -19,16 +16,12 @@
             {%- endcall -%}
             {%- set existing_aggrgegate_policies_for_table = load_result('main')['data'] -%}
 
-            {% if dbt_monitorial_datagovernance.model_meta_contains_item("aggregation_policies", model) %}
+            {% if _aggregation_policy_data is not none %}
                 {%- set apply_policies = [] %}
                 {%- set no_change_policies = [] %}
                 {%- set remove_policies = [] %}
 
-                {%- set dbt_aggregation_policies = meta_data["aggregation_policies"] -%}
-
-                {% if dbt_aggregation_policies is none %}
-                {%set dbt_aggregation_policies = [] %}
-                {% endif %}
+                {%- set dbt_aggregation_policies = _aggregation_policy_data if _aggregation_policy_data else [] -%}
 
                 {% if dbt_aggregation_policies|length == 0 and existing_aggrgegate_policies_for_table|length > 0 %}
                     {% for policy in existing_aggrgegate_policies_for_table %}
