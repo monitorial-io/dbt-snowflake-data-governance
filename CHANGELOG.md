@@ -2,6 +2,11 @@
 
 **This changelog is for the Monitorial Snowflake Data Governance Project. It includes all changes made to the project, including new features, bug fixes, and other improvements.*
 
+## Version 1.0.1 (2026-06-22)
+- Added support for top-level config keys (`config.row_access_policy`, `config.aggregation_policies`) as an alternative to `config.meta`, suppressing dbt-snowflake 2.0+ `dbt1000` warnings
+- The `config.meta` approach remains the primary lookup (fusion approach); top-level config is used as a fallback
+- Added `get_model_meta_item` helper macro to centralise config/meta resolution logic
+
 ## Version 1.0.0 (2025-05-10)
 - **Breaking**: Bumped minimum dbt version to 1.9.0 and added forward compatibility for dbt 2.x/3.x (dbt-fusion)
 - Fixed undefined variable `table_name` in `set_column_tag_value` macro (was `table_name`, should be `model_name`)

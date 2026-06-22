@@ -9,3 +9,7 @@ macros:
     description: This macro checks if a model's metadata contains a specific item by name
     docs:
       show: false
+  - name: get_model_meta_item
+    description: Returns the value of a metadata item from config.meta (primary) or top-level config (fallback), or none if not found
+    docs:
+      show: false

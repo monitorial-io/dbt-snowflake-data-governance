@@ -257,16 +257,37 @@ Applies Snowflake aggregation policies to models based on model-level `meta`.
 
 **Usage:**
 
+The macro supports two configuration styles. The `config.meta` approach is the primary pattern:
+
 ```yaml
+# Primary: config.meta (fusion approach)
 models:
   - name: your_model
-    meta:
+    config:
+      meta:
+        aggregation_policies:
+          - name: your_aggregation_policy_name
+            entity_keys:             # Optional: columns used as entity keys
+              - first_name
+              - surname
+          - name: simple_policy      # No entity_keys = policy applied without ENTITY KEY clause
+    columns:
+      - name: first_name
+        type: VARCHAR
+      - name: surname
+        type: VARCHAR
+```
+
+```yaml
+# Alternative: top-level config (avoids dbt-snowflake 2.0+ dbt1000 warning)
+models:
+  - name: your_model
+    config:
       aggregation_policies:
         - name: your_aggregation_policy_name
-          entity_keys:             # Optional: columns used as entity keys
+          entity_keys:
             - first_name
             - surname
-        - name: simple_policy      # No entity_keys = policy applied without ENTITY KEY clause
     columns:
       - name: first_name
         type: VARCHAR
@@ -330,13 +351,34 @@ Applies a Snowflake row access policy to a model based on model-level `meta`.
 
 **Usage:**
 
+The macro supports two configuration styles. The `config.meta` approach is the primary pattern:
+
 ```yaml
+# Primary: config.meta (fusion approach)
 models:
   - name: your_model
-    meta:
+    config:
+      meta:
+        row_access_policy:
+          - name: your_row_access_policy_name
+            columns:
+              - first_name
+              - surname
+    columns:
+      - name: first_name
+        type: VARCHAR
+      - name: surname
+        type: VARCHAR
+```
+
+```yaml
+# Alternative: top-level config (avoids dbt-snowflake 2.0+ dbt1000 warning)
+models:
+  - name: your_model
+    config:
       row_access_policy:
         - name: your_row_access_policy_name
-          columns:                    # Columns passed to the ON (...) clause
+          columns:
             - first_name
             - surname
     columns:

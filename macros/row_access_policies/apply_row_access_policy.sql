@@ -6,10 +6,7 @@
         {%- set model_schema_full = model_database + '.' + model_schema -%}
         {%- set model_alias = model.alias|upper -%}
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
-        {% set meta_data = model.config.get("meta", {}) if model.config is defined else {} %}
-        {% if not meta_data %}
-            {% set meta_data = model.get("meta", {}) %}
-        {% endif %}
+        {% set _row_access_policy_data = dbt_monitorial_datagovernance.get_model_meta_item("row_access_policy", model) %}
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}
                 select
@@ -18,8 +15,8 @@
                 where policy_kind = 'ROW_ACCESS_POLICY';
             {%- endcall -%}
             {%- set existing_row_access_policies_for_table = load_result('main')['data'] -%}
-            {% if dbt_monitorial_datagovernance.model_meta_contains_item("row_access_policy", model) %}
-                {%- set dbt_row_access_policies = meta_data["row_access_policy"]  -%}
+            {% if _row_access_policy_data is not none %}
+                {%- set dbt_row_access_policies = _row_access_policy_data if _row_access_policy_data else [] -%}
                 {% if dbt_row_access_policies|length == 0 and existing_row_access_policies_for_table|length > 0 %}
                     {% set policy_name = existing_row_access_policies_for_table[0][0] %}
                     {{ dbt_monitorial_datagovernance.drop_row_access_policy(materialization, model_schema, model_alias, policy_name)}}
