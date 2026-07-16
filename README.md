@@ -170,7 +170,7 @@ GRANT APPLY ROW ACCESS POLICY ON ACCOUNT TO ROLE your_role;
 | `apply_tags(tag_names)` | Column-level | `columns.meta.<tag_name>` | Applies/removes Snowflake tags based on column metadata |
 | `apply_aggregation_policies()` | Model-level | `model.meta.aggregation_policies` | Applies/removes aggregation policies based on model metadata |
 | `apply_projection_policies()` | Column-level | `columns.meta.projection_policy` | Applies/removes projection policies based on column metadata |
-| `apply_row_access_policy()` | Model-level | `model.meta.row_access_policy` | Applies/removes row access policies based on model metadata |
+| `apply_row_access_policy()` | Model-level | `model.meta.access_policy` (fallback: `row_access_policy`) | Applies/removes row access policies based on model metadata |
 
 ### Internal Macros (called by public macros, `docs.show: false`)
 
@@ -344,22 +344,22 @@ Applies a Snowflake row access policy to a model based on model-level `meta`.
 - **Adds** the policy if none exists
 - **Replaces** (drop + add) if the policy name or columns differ
 - **Skips** if the existing policy matches exactly
-- If `row_access_policy` is present in meta but empty: removes any existing policy
-- If `row_access_policy` is absent from meta and a policy exists: removes the existing policy
+- If `access_policy` is present in meta but empty: removes any existing policy
+- If `access_policy` is absent from meta and a policy exists: removes the existing policy
 
 **Constraints:** Snowflake allows only **one** row access policy per table/view. If you need multiple policies, combine their logic into a single policy.
 
 **Usage:**
 
-The macro supports two configuration styles. The `config.meta` approach is the primary pattern:
+The preferred config key is `access_policy`. The legacy `row_access_policy` key is still supported as a fallback but should be migrated to avoid `dbt1000` warnings in dbt-snowflake 2.0+ (which now uses `row_access_policy` as a native config key).
 
 ```yaml
-# Primary: config.meta (fusion approach)
+# Preferred: access_policy (avoids dbt1000 warning)
 models:
   - name: your_model
     config:
       meta:
-        row_access_policy:
+        access_policy:
           - name: your_row_access_policy_name
             columns:
               - first_name
@@ -372,15 +372,16 @@ models:
 ```
 
 ```yaml
-# Alternative: top-level config (avoids dbt-snowflake 2.0+ dbt1000 warning)
+# Legacy (still supported as fallback): row_access_policy
 models:
   - name: your_model
     config:
-      row_access_policy:
-        - name: your_row_access_policy_name
-          columns:
-            - first_name
-            - surname
+      meta:
+        row_access_policy:
+          - name: your_row_access_policy_name
+            columns:
+              - first_name
+              - surname
     columns:
       - name: first_name
         type: VARCHAR

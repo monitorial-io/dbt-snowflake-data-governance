@@ -56,7 +56,7 @@ models:
     description: "Test model for validating row access policy application"
     config:
       meta:
-        row_access_policy:
+        access_policy:
           - name: restrict_rows
             columns:
               - id
