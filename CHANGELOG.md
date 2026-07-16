@@ -2,6 +2,10 @@
 
 **This changelog is for the Monitorial Snowflake Data Governance Project. It includes all changes made to the project, including new features, bug fixes, and other improvements.*
 
+## Version 1.0.2 (2026-07-16)
+- Fixed string concatenation in `set_column_tag_value` macro: replaced `+` operator with Jinja `~` operator to prevent type coercion errors when operands are not strings
+- Renamed row access policy config key from `row_access_policy` to `access_policy` to avoid `dbt1000` warnings in dbt-snowflake 2.0+ (which now uses `row_access_policy` as a native config key). The old `row_access_policy` key is still supported as a fallback for backward compatibility.
+
 ## Version 1.0.1 (2026-06-22)
 - Added support for top-level config keys (`config.row_access_policy`, `config.aggregation_policies`) as an alternative to `config.meta`, suppressing dbt-snowflake 2.0+ `dbt1000` warnings
 - The `config.meta` approach remains the primary lookup (fusion approach); top-level config is used as a fallback

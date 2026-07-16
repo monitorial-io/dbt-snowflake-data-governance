@@ -6,7 +6,10 @@
         {%- set model_schema_full = model_database + '.' + model_schema -%}
         {%- set model_alias = model.alias|upper -%}
         {%- set materialization = materialization_map[model.config.get("materialized")] -%}
-        {% set _row_access_policy_data = dbt_monitorial_datagovernance.get_model_meta_item("row_access_policy", model) %}
+        {% set _row_access_policy_data = dbt_monitorial_datagovernance.get_model_meta_item("access_policy", model) %}
+        {% if _row_access_policy_data is none %}
+            {% set _row_access_policy_data = dbt_monitorial_datagovernance.get_model_meta_item("row_access_policy", model) %}
+        {% endif %}
         {% if materialization in ["table", "view"] %}
             {%- call statement('main', fetch_result=True) -%}
                 select
