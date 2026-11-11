@@ -126,6 +126,19 @@ vars:
   policy_store: "POLICIES"
 ```
 
+### Optional dbt Variables
+
+| Variable | Description | Default Value |
+| -------- | ----------- | ------------- |
+| `previous_tag_locations` | A list of `{database, schema}` pairs that previously held the tag store. When moving `data_governance_database`/`tag_store` to a new location, declare the old location(s) here so `apply_tags` cleans up any leftover tags with a matching name at those locations once the tag has been re-applied at the new location. Only locations listed here are ever removed — tags in any other, undeclared database/schema are left untouched. | `[]` |
+
+```yaml
+vars:
+  previous_tag_locations:
+    - database: "OLD_DATA_GOVERNANCE_DATABASE"
+      schema: "TAGS"
+```
+
 ### Post-Hook Setup
 
 The macros must be called as `post-hook` on your models. You can configure this globally in `dbt_project.yml` or per-model in schema YAML:
@@ -201,8 +214,9 @@ Applies Snowflake tags to model columns based on column-level `meta` properties.
 - Queries existing tags via `information_schema.tag_references_all_columns()`
 - For each column with a matching meta key: sets the tag if it doesn't exist or has a different value
 - If the meta value is `"none"`: unsets (removes) the tag
-- If the meta value is `"public"`: skips the tag (no action)
+- If the meta value is `"public"`: skips the tag (no action, including the previous-location cleanup described below)
 - If the tag already has the correct value: skips (no action, logged as `[IGNORE]`)
+- After applying the tag at the configured `data_governance_database`/`tag_store` location, if a same-named tag also exists at a database/schema listed in the `previous_tag_locations` var, that tag is unset from the old location. Locations not listed in `previous_tag_locations` are never touched, even if a same-named tag exists there — this avoids removing a tag that may be managed by an unrelated system. See [Optional dbt Variables](#optional-dbt-variables).
 
 **Tag name mapping:** The macro automatically maps certain meta key names to Snowflake tag names:
 

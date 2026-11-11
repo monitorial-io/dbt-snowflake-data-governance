@@ -11,7 +11,7 @@
             {{ log("Applying tags for model " + model_schema|lower ~ "." ~ model_alias|lower, info=True) }}
             {%- call statement('main', fetch_result=True) -%}
                 select
-                    LEVEL,OBJECT_NAME,COLUMN_NAME,UPPER(TAG_NAME) as TAG_NAME,TAG_VALUE
+                    LEVEL,OBJECT_NAME,COLUMN_NAME,UPPER(TAG_NAME) as TAG_NAME,TAG_VALUE,UPPER(TAG_DATABASE) as TAG_DATABASE,UPPER(TAG_SCHEMA) as TAG_SCHEMA
                 from table(information_schema.tag_references_all_columns('{{model_schema_full}}.{{model_alias}}', 'table'))
             {%- endcall -%}
             {%- set existing_tags_for_table = load_result('main')['data'] -%}

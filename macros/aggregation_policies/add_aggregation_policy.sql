@@ -11,7 +11,7 @@
     {% endif %}
 
     {% set result = load_result('set_statement')%}
-    {% if result['response']|string != "SUCCESS 1" %}
+    {% if result['response']['code'] != "SUCCESS" %}
         {{ log("ERROR adding aggregation policy on model '" ~ model_name|lower ~ " ............... [" + result["response"]|string  + "]", info=True) }}
         {{ log(result.data, info=True) }}
     {% endif %}

@@ -3,7 +3,7 @@
         alter {{materialization}} {{model_schema|upper}}.{{model_name|upper}} modify column {{column_name}} set projection policy {{ var("data_governance_database") }}.{{ var("policy_store") }}.{{ projection_policy_name }} force;
     {%- endcall -%}
     {% set result = load_result('set_statement')%}
-    {% if result['response']|string != "SUCCESS 1" %}
+    {% if result['response']['code'] != "SUCCESS" %}
         {{ log("ERROR setting projection policy " ~ projection_policy_name ~ " on column '" ~ column_name|lower ~ " ............... [" + result["response"]|string  + "]", info=True) }}
         {{ log(result.data, info=True) }}
     {% endif %}
