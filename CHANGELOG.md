@@ -3,7 +3,7 @@
 **This changelog is for the Monitorial Snowflake Data Governance Project. It includes all changes made to the project, including new features, bug fixes, and other improvements.*
 
 ## Version 1.0.3 (2026-11-11)
-- Fixed `apply_tags`/`set_column_tag_value` not removing tags left behind in a previous `data_governance_database`/`tag_store` location: tag matching now tracks `TAG_DATABASE`/`TAG_SCHEMA`, and any tag with a matching name found outside the currently configured governance location is unset automatically
+- Fixed `apply_tags`/`set_column_tag_value` not removing tags left behind after moving the tag store to a new `data_governance_database`/`tag_store`: added an opt-in `previous_tag_locations` var — a list of `{database, schema}` pairs — so that once a tag is (re-)applied at the current location, a same-named tag is also unset from any declared previous location. Only locations explicitly listed in `previous_tag_locations` are ever touched, so tags in other, undeclared databases/schemas (e.g. managed by an unrelated system) are left alone. Cleanup runs after the tag is applied at the current location (not before), and is skipped entirely when the meta value is `"public"`
 - Fixed false `ERROR` log messages on successful `SET`/`UNSET TAG`/`POLICY` statements: the success check compared the stringified response object to the literal `"SUCCESS 1"`, which never matched; now checks `result['response']['code'] == "SUCCESS"` in `set_column_tag_value`, `add_aggregation_policy`, `drop_aggregation_policy`, `set_column_projection_policy`, `unset_column_projection_policy`, `add_row_access_policy`, and `drop_row_access_policy`
 
 ## Version 1.0.2 (2026-07-16)
