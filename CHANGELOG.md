@@ -2,6 +2,10 @@
 
 **This changelog is for the Monitorial Snowflake Data Governance Project. It includes all changes made to the project, including new features, bug fixes, and other improvements.*
 
+## Version 1.0.3 (2026-11-11)
+- Fixed `apply_tags`/`set_column_tag_value` not removing tags left behind in a previous `data_governance_database`/`tag_store` location: tag matching now tracks `TAG_DATABASE`/`TAG_SCHEMA`, and any tag with a matching name found outside the currently configured governance location is unset automatically
+- Fixed false `ERROR` log messages on successful `SET`/`UNSET TAG`/`POLICY` statements: the success check compared the stringified response object to the literal `"SUCCESS 1"`, which never matched; now checks `result['response']['code'] == "SUCCESS"` in `set_column_tag_value`, `add_aggregation_policy`, `drop_aggregation_policy`, `set_column_projection_policy`, `unset_column_projection_policy`, `add_row_access_policy`, and `drop_row_access_policy`
+
 ## Version 1.0.2 (2026-07-16)
 - Fixed string concatenation in `set_column_tag_value` macro: replaced `+` operator with Jinja `~` operator to prevent type coercion errors when operands are not strings
 - Renamed row access policy config key from `row_access_policy` to `access_policy` to avoid `dbt1000` warnings in dbt-snowflake 2.0+ (which now uses `row_access_policy` as a native config key). The old `row_access_policy` key is still supported as a fallback for backward compatibility.

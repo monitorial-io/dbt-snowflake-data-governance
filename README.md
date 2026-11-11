@@ -203,6 +203,7 @@ Applies Snowflake tags to model columns based on column-level `meta` properties.
 - If the meta value is `"none"`: unsets (removes) the tag
 - If the meta value is `"public"`: skips the tag (no action)
 - If the tag already has the correct value: skips (no action, logged as `[IGNORE]`)
+- If a same-named tag exists in a **different** database/schema than the currently configured `data_governance_database`/`tag_store` (e.g. after moving the tag store to a new database), that stale tag is automatically unset from its old location before the tag is applied in the new location
 
 **Tag name mapping:** The macro automatically maps certain meta key names to Snowflake tag names:
 
