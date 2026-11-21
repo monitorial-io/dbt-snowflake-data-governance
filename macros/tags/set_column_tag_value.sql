@@ -18,7 +18,7 @@
             alter {{materialization}} {{model_schema|upper}}.{{model_name|upper}} modify column {{column_name}} unset tag {{ var("data_governance_database") }}.{{ var("tag_store") }}.{{tag_name|upper}}
         {%- endcall -%}
         {% set result = load_result('unset_statement')%}
-        {% if result['response']['code'] != "SUCCESS" %}
+        {% if not dbt_monitorial_datagovernance.is_statement_success(result['response']) %}
             {{ log("ERROR removing tag " ~ tag_name ~ " from column '" ~ column_name|lower ~ "' for " ~ materialization|lower ~ " model " ~  model_schema|lower ~ "." ~ model_name|lower ~ " ............... [" ~ result["response"]|string  ~ "]", info=True) }}
             {{ log(result.data, info=True) }}
         {% endif %}
@@ -27,7 +27,7 @@
             alter {{materialization}} {{model_schema|upper}}.{{model_name|upper}} modify column {{column_name}} set tag {{ var("data_governance_database") }}.{{ var("tag_store") }}.{{tag_name|upper}} = '{{desired_tag_value}}'
         {%- endcall -%}
         {% set result = load_result('set_statement')%}
-        {% if result['response']['code'] != "SUCCESS" %}
+        {% if not dbt_monitorial_datagovernance.is_statement_success(result['response']) %}
             {{ log("ERROR setting tag " ~ tag_name ~ " on column '" ~ column_name|lower ~ "' to value' " ~ desired_tag_value ~ "' for " ~ materialization|lower ~ " model " ~  model_schema|lower ~ "." ~ model_name|lower ~ " ............... [" ~ result["response"]|string  ~ "]", info=True) }}
             {{ log(result.data, info=True) }}
         {% endif %}
@@ -50,7 +50,7 @@
                     alter {{materialization}} {{model_schema|upper}}.{{model_name|upper}} modify column {{column_name}} unset tag "{{stale_tag[5]}}"."{{stale_tag[6]}}"."{{tag_name|upper}}"
                 {%- endcall -%}
                 {% set stale_result = load_result('unset_stale_statement')%}
-                {% if stale_result['response']['code'] != "SUCCESS" %}
+                {% if not dbt_monitorial_datagovernance.is_statement_success(stale_result['response']) %}
                     {{ log("ERROR removing stale tag " ~ tag_name ~ " from declared previous location " ~ stale_tag[5] ~ "." ~ stale_tag[6] ~ " on column '" ~ column_name|lower ~ "' for " ~ materialization|lower ~ " model " ~  model_schema|lower ~ "." ~ model_name|lower ~ " ............... [" ~ stale_result["response"]|string  ~ "]", info=True) }}
                     {{ log(stale_result.data, info=True) }}
                 {% else %}
