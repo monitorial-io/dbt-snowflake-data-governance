@@ -4,7 +4,7 @@
         alter {{materialization}} {{model_schema|upper}}.{{model_name|upper}} drop row access policy {{ var("data_governance_database") }}.{{ var("policy_store") }}.{{ policy_name }};
     {%- endcall -%}
     {% set result = load_result('set_statement')%}
-    {% if not is_statement_success(result['response']) %}
+    {% if not dbt_monitorial_datagovernance.is_statement_success(result['response']) %}
         {{ log("ERROR dropping row access policy on model '" ~ model_name|lower ~ " ............... [" + result["response"]|string  + "]", info=True) }}
         {{ log(result.data, info=True) }}
     {% endif %}
